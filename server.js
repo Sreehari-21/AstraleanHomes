@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -7,6 +8,9 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+// Serve static files from React app
+app.use(express.static(path.join(__dirname, 'build')));
 
 const USERS_FILE = 'users.json';
 
@@ -51,6 +55,11 @@ app.post('/login', async (req, res) => {
   res.status(200).json({ message: 'Login successful' });
 });
 
+// Serve React app for all other routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
 // Start server
-const PORT = 5000;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -1,0 +1,44 @@
+/* Reset & Base */
+:root {
+  --primary-color: #8c6239;
+  --secondary-color: #704d2d;
+  --bg-color: #f8f9fa;
+  --text-primary: #1a1a1a;
+  --text-secondary: #555;
+  --white: #ffffff;
+  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Outfit', sans-serif;
+}
+
+body {
+  color: var(--text-primary);
+  background: var(--bg-color);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { 
+  text-decoration: none; 
+  color: inherit; 
+  transition: var(--transition);
+}
+
+ul { list-style: none; }
+
+html, body {
+  min-height: 100vh;
+  scroll-behavior: smooth;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
