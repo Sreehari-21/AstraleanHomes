@@ -10,7 +10,6 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
@@ -19,12 +18,14 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.get(`http://localhost:5000/users?email=${email}&password=${password}`);
+      const response = await axios.post('http://localhost:5001/api/auth/login', {
+        email,
+        password,
+      });
 
-      if (response.data && response.data.length > 0) {
-        const userData = response.data[0];
-        login(userData);
-        if (userData.role === 'admin') {
+      if (response.data && response.data.token) {
+        login(response.data.token);
+        if (response.data.user.role === 'admin') {
           navigate('/admin/dashboard');
         } else {
           navigate('/');
@@ -33,7 +34,7 @@ function Login() {
         setError('Invalid email or password.');
       }
     } catch (err) {
-      setError('Login failed. Please check your connection.');
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }

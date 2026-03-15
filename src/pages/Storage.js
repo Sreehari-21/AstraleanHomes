@@ -12,7 +12,7 @@ function Storage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/products?category=storage');
+        const response = await axios.get('http://localhost:5001/products?category=storage');
         setStorageItems(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);

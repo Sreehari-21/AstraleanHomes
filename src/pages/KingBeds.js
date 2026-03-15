@@ -12,7 +12,7 @@ function KingBeds() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/products?category=kingbeds');
+        const response = await axios.get('http://localhost:5001/api/products?category=kingbeds');
         setKingBeds(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);

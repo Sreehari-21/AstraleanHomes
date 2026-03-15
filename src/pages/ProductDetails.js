@@ -15,8 +15,7 @@ function ProductDetails() {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        // Using json-server query format ?id=value
-        const response = await axios.get(`http://localhost:5000/products?id=${id}`);
+        const response = await axios.get(`http://localhost:5001/api/products/${id}`);
         // json-server returns an array for queries, even if there's only one match
         if (response.data && response.data.length > 0) {
           setProduct(response.data[0]);

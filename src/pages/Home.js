@@ -16,8 +16,6 @@ function Home() {
     { title: 'Explore Decor', link: '/decor', image: 'https://images.unsplash.com/photo-1618220179428-22790b46a0eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' },
   ];
 
-
-
   useEffect(() => {
     const interval = setInterval(() => {
       setSlideIndex(prev => (prev + 1) % slides.length);
@@ -80,8 +78,6 @@ function Home() {
           <p>Discover premium furniture for your dream home</p>
         </div>
       </section>
-
-
 
       <section className="features-section">
         <h2>Why Choose AstraleanHomes?</h2>

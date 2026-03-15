@@ -36,6 +36,7 @@ function Navbar() {
                 <li><Link to="/admin/dashboard" className="nav-link">Dashboard</Link></li>
                 <li><Link to="/admin/products" className="nav-link">Products</Link></li>
                 <li><Link to="/admin/orders" className="nav-link">Orders</Link></li>
+                <li><Link to="/admin/settings" className="nav-link">Settings</Link></li>
               </>
             ) : (
               // Regular User/Guest Navigation Links
@@ -102,7 +103,9 @@ function Navbar() {
         {cartItems.length > 0 && (
           <div className="cart-footer">
             <h3>Total: ₹{cartTotal.toFixed(2)}</h3>
-            <button className="btn checkout-btn">Proceed to Checkout</button>
+            <button className="btn checkout-btn" onClick={() => { setIsCartOpen(false); navigate('/checkout'); }}>
+              Proceed to Checkout
+            </button>
           </div>
         )}
       </div>

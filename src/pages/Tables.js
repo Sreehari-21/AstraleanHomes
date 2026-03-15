@@ -12,7 +12,7 @@ function Tables() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/products?category=tables');
+        const response = await axios.get('http://localhost:5001/products?category=tables');
         setTables(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);

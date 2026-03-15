@@ -12,7 +12,7 @@ function Decor() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/products?category=decor');
+        const response = await axios.get('http://localhost:5001/products?category=decor');
         setDecorItems(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);

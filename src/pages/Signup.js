@@ -11,7 +11,6 @@ function Signup() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
@@ -23,36 +22,18 @@ function Signup() {
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
     setLoading(true);
-
     try {
-      // First check if user exists
-      const existingUser = await axios.get(`http://localhost:5000/users?email=${email}`);
-      if (existingUser.data && existingUser.data.length > 0) {
-        setError('Email is already registered.');
-        setLoading(false);
-        return;
-      }
-
-      const newUser = {
-        email,
-        password,
-        role: 'user' // Default role for new signups
-      };
-
-      const response = await axios.post('http://localhost:5000/users', newUser);
-
-      if (response.status === 201) {
-        login(response.data);
+      const response = await axios.post('http://localhost:5001/api/auth/register', { email, password });
+      
+      // Auto-login after registration
+      const loginRes = await axios.post('http://localhost:5001/api/auth/login', { email, password });
+      if (loginRes.data.token) {
+        login(loginRes.data.token);
         navigate('/');
       }
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      setError(err.response?.data?.message || 'Failed to create account');
     } finally {
       setLoading(false);
     }

@@ -31,7 +31,7 @@ function ManageProducts() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/products');
+      const response = await axios.get('http://localhost:5001/api/products');
       setProducts(response.data);
     } catch (error) {
       console.error('Failed to fetch products', error);
@@ -77,7 +77,7 @@ function ManageProducts() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await axios.delete(`http://localhost:5000/products/${String(id)}`);
+        await axios.delete(`http://localhost:5001/api/products/${String(id)}`);
         fetchProducts(); // Refresh list
       } catch (error) {
         console.error('Failed to delete', error);
@@ -91,11 +91,12 @@ function ManageProducts() {
     try {
       if (isEditing) {
         // Update existing (ensure ID is string)
-        await axios.put(`http://localhost:5000/products/${String(formData.id)}`, formData);
+        // In the new API, POST handles both add (new) and update (existing) if ID is provided
+        await axios.post(`http://localhost:5001/api/products`, formData);
       } else {
         // Create new
         const newProduct = { ...formData, id: `prod-${Date.now()}` };
-        await axios.post('http://localhost:5000/products', newProduct);
+        await axios.post('http://localhost:5001/api/products', newProduct);
       }
       setShowForm(false);
       fetchProducts(); // Refresh list

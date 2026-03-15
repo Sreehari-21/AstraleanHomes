@@ -19,12 +19,14 @@ import Storage from './pages/Storage';
 import Decor from './pages/Decor';
 import Contact from './pages/Contact';
 import ProductDetails from './pages/ProductDetails';
+import Checkout from './pages/Checkout';
 
 // Admin Pages
 import AdminRoute from './components/AdminRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageProducts from './pages/admin/ManageProducts';
 import ManageOrders from './pages/admin/ManageOrders';
+import AdminSettings from './pages/admin/AdminSettings';
 
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
@@ -54,11 +56,13 @@ function App() {
           <Route path="/storage" element={<Storage />} />
           <Route path="/decor" element={<Decor />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/checkout" element={<Checkout />} />
 
           {/* Admin Protected Routes */}
           <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/products" element={<AdminRoute><ManageProducts /></AdminRoute>} />
           <Route path="/admin/orders" element={<AdminRoute><ManageOrders /></AdminRoute>} />
+          <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
         </Routes>
         <Footer />
         </Router>
