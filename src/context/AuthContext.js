@@ -21,7 +21,10 @@ const AuthContext = createContext(null);
 // AuthProvider component
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('jwt_token'));
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedToken = localStorage.getItem('jwt_token');
+    return savedToken ? decodeJwt(savedToken) : null;
+  });
 
   // Effect to decode token and set user when token changes
   useEffect(() => {

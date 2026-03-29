@@ -13,7 +13,8 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Import Models
 const Product = require('./models/Product');
@@ -24,6 +25,29 @@ const Order = require('./models/Order');
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.error('MongoDB connection error:', err));
+
+// Middleware to protect routes
+const protect = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ message: 'No token, authorization denied' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res.status(401).json({ message: 'Token is not valid' });
+  }
+};
+
+// Middleware to check admin role
+const admin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    res.status(403).json({ message: 'Access denied: Admins only' });
+  }
+};
 
 // --- API ROUTES ---
 
@@ -89,7 +113,7 @@ app.get('/api/settings', async (req, res) => {
 });
 
 // Settings: Update
-app.put('/api/settings', async (req, res) => {
+app.put('/api/settings', protect, admin, async (req, res) => {
   try {
     const settings = await Settings.findOneAndUpdate({ id: 'global' }, req.body, { new: true, upsert: true });
     res.json(settings);
@@ -123,18 +147,41 @@ app.get('/api/products/:id', async (req, res) => {
 });
 
 // Products: Delete (Admin)
-app.delete('/api/products/:id', async (req, res) => {
+app.delete('/api/products/:id', protect, admin, async (req, res) => {
+  const { id } = req.params;
+  console.log(`[DELETE] Request received for ID: ${id}`);
   try {
-    const result = await Product.deleteOne({ id: req.params.id });
-    if (result.deletedCount === 0) return res.status(404).json({ message: 'Product not found' });
+    let result;
+    
+    // Try deleting by _id first if it looks like a valid MongoDB ObjectID
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      console.log(`Attempting deletion by _id: ${id}`);
+      result = await Product.deleteOne({ _id: id });
+    }
+    
+    // If not found or not an ObjectID, try deleting by the custom 'id' field
+    if (!result || result.deletedCount === 0) {
+      console.log(`Attempting deletion by custom id: ${id}`);
+      result = await Product.deleteOne({ id: id });
+    }
+
+    console.log(`Deletion result:`, result);
+
+    if (result.deletedCount === 0) {
+      console.warn(`Product not found for deletion: ${id}`);
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    
+    console.log(`Successfully deleted product: ${id}`);
     res.json({ message: 'Product deleted' });
   } catch (error) {
+    console.error(`Error deleting product ${id}:`, error);
     res.status(500).json({ message: error.message });
   }
 });
 
 // Products: Add/Update (Admin)
-app.post('/api/products', async (req, res) => {
+app.post('/api/products', protect, admin, async (req, res) => {
   try {
     const { id } = req.body;
     let product = await Product.findOne({ id });

@@ -27,7 +27,7 @@
 
 /* Page Hero Premium Styling */
 .page-hero-section {
-  height: 60vh;
+  height: 48vh;
   position: relative;
   display: flex;
   justify-content: center;
@@ -50,15 +50,18 @@
 .page-hero-section.dining-hero,
 .page-hero-section.storage-hero,
 .page-hero-section.decor-hero,
-.page-hero-section.contact-hero {
+.page-hero-section.contact-hero,
+.page-hero-section.login-hero,
+.page-hero-section.signup-hero {
   background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(140, 98, 57, 0.8) 100%), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover fixed;
 }
 
 .page-hero-overlay {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6));
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
   z-index: 1;
+  pointer-events: none !important;
 }
 
 .page-hero-content {
@@ -73,14 +76,14 @@
 .page-hero-content h1 {
   font-size: 4rem;
   font-weight: 800;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   letter-spacing: -1.5px;
-  color: var(--white);
+  color: var(--white) !important;
 }
 
 .page-hero-content p {
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 300;
   line-height: 1.6;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
@@ -95,12 +98,12 @@
 
 /* Products Section & Grid */
 .products-section, .products-container {
-  padding: 6rem 2rem;
+  padding: 4.8rem 2rem;
   background-color: var(--bg-color);
 }
 
 .container {
-  max-width: 1280px;
+  max-width: 960px;
   margin: 0 auto;
 }
 
@@ -194,6 +197,54 @@
   background: var(--primary-color);
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(140, 98, 57, 0.2);
+}
+
+.view-product-btn, .explore-btn {
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--text-primary);
+  padding: 0.8rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 50px; /* Pill shape for premium feel */
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  width: 85%;
+  margin: 1.5rem auto 0 auto;
+  display: block;
+  text-align: center;
+  text-decoration: none !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.view-product-btn::before, .explore-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: var(--text-primary);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  z-index: -1;
+}
+
+.view-product-btn:hover, .explore-btn:hover {
+  color: var(--white);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.view-product-btn:hover::before, .explore-btn:hover::before {
+  width: 100%;
+}
+
+.view-product-btn:active, .explore-btn:active {
+  transform: translateY(-1px);
 }
 
 /* Categories UI */
@@ -335,4 +386,21 @@
   .product-card > a {
     margin: 0 1rem 1rem 1rem;
   }
+}
+
+.auth-footer {
+  margin-top: 1.5rem;
+  color: #666;
+}
+
+.auth-link {
+  color: #000000;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.auth-link:hover {
+  color: #333333;
+  text-decoration: underline;
 }

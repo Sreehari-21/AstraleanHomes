@@ -1,3 +1,4 @@
+import { API_URL } from "../config";
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
@@ -25,7 +26,7 @@ function Checkout() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await axios.get('http://localhost:5001/api/settings');
+        const res = await axios.get(`${API_URL}/api/settings`);
         setSettings(res.data);
       } catch (err) {
         console.error('Failed to load settings', err);
@@ -55,7 +56,7 @@ function Checkout() {
         status: 'pending'
       };
 
-      await axios.post('http://localhost:5001/api/orders', orderPayload);
+      await axios.post(`${API_URL}/api/orders`, orderPayload);
       alert('Order placed successfully!');
       clearCart();
       navigate('/');

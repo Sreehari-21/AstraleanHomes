@@ -17,7 +17,23 @@ export function CartProvider({ children }) {
   });
 
   useEffect(() => {
-    localStorage.setItem('astraleanCart', JSON.stringify(cartItems));
+    // Sanitize data before saving to localStorage to prevent QuotaExceededError
+    const sanitizedCart = cartItems.map(item => ({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      image: item.image,
+      quantity: item.quantity,
+      category: item.category
+    }));
+
+    try {
+      localStorage.setItem('astraleanCart', JSON.stringify(sanitizedCart));
+    } catch (error) {
+      console.error('Failed to save cart to localStorage:', error);
+      // If quota exceeded, we can't do much but notify the console
+      // and ensure the app doesn't crash
+    }
   }, [cartItems]);
 
   const [toastMessage, setToastMessage] = useState(null);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -7,16 +7,18 @@ import './Navbar.css';
 function Navbar() {
   const [showNav, setShowNav] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const { cartItems, cartCount, removeFromCart, updateQuantity } = useCart();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const { cartItems, cartCount, removeFromCart, updateQuantity, cartTotal } = useCart();
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  // Calculate cartTotal locally, ensuring price parsing handles '₹'
-  const cartTotal = cartItems.reduce((total, item) => {
-    // Ensure item.price is treated as a string before replace, and handle potential non-numeric values
-    const price = parseFloat(String(item.price).replace('₹', '')) || 0;
-    return total + (price * item.quantity);
-  }, 0);
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -25,44 +27,60 @@ function Navbar() {
 
   return (
     <>
-      <header className="navbar">
-        <div className="logo">AstraleanHomes</div>
+      <header className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+        <div className="logo">
+          <Link to="/">
+            AstraleanHomes
+          </Link>
+        </div>
+
         <nav className={`nav-links ${showNav ? 'show' : ''}`}>
           <ul>
-            <li><Link to="/" className="nav-link">Home</Link></li>
+            <li>
+              <Link to="/" onClick={() => setShowNav(false)}>Home</Link>
+            </li>
             {isAdmin ? (
-              // Admin Navigation Links
               <>
-                <li><Link to="/admin/dashboard" className="nav-link">Dashboard</Link></li>
-                <li><Link to="/admin/products" className="nav-link">Products</Link></li>
-                <li><Link to="/admin/orders" className="nav-link">Orders</Link></li>
-                <li><Link to="/admin/settings" className="nav-link">Settings</Link></li>
+                <li>
+                  <Link to="/admin/dashboard" onClick={() => setShowNav(false)}>Dashboard</Link>
+                </li>
+                <li>
+                  <Link to="/products" onClick={() => setShowNav(false)}>View Store</Link>
+                </li>
+                <li className="user-nav">
+                  <span className="user-name">admin</span>
+                  <button className="btn logout-btn" onClick={handleLogout}>Logout</button>
+                </li>
               </>
             ) : (
-              // Regular User/Guest Navigation Links
               <>
-                <li><Link to="/products" className="nav-link">Furnitures</Link></li>
-                <li><Link to="/furnishings" className="nav-link">Furnishings</Link></li>
-                <li><Link to="/contact" className="nav-link">Contact</Link></li>
-                <li className="cart-icon" onClick={() => setIsCartOpen(true)}>
-                  Cart <span className="cart-badge">{cartCount}</span>
+                <li>
+                  <Link to="/products" onClick={() => setShowNav(false)}>Furnitures</Link>
+                </li>
+                <li>
+                  <Link to="/furnishings" onClick={() => setShowNav(false)}>Furnishings</Link>
+                </li>
+                <li>
+                  <div className="cart-icon" onClick={() => setIsCartOpen(true)}>
+                    <span>🛒</span>
+                    {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+                  </div>
+                </li>
+                <li>
+                  {user ? (
+                    <div className="user-nav">
+                      <span className="user-name">{user.email.split('@')[0]}</span>
+                      <button className="btn logout-btn" onClick={handleLogout}>Logout</button>
+                    </div>
+                  ) : (
+                    <Link to="/login" className="btn" onClick={() => setShowNav(false)}>Login</Link>
+                  )}
                 </li>
               </>
             )}
-            <li className="login-btn">
-              {user ? (
-                <>
-                  <span className="user-name">
-                    {user.email} {isAdmin && '(Admin)'}
-                  </span>
-                  <button onClick={handleLogout} className="btn logout-btn">Logout</button>
-                </>
-              ) : (
-                <Link to="/login" className="btn">Login</Link>
-              )}
-            </li>
           </ul>
         </nav>
+
         <div 
           className="hamburger"
           onClick={() => setShowNav(!showNav)}
@@ -93,7 +111,7 @@ function Navbar() {
                     <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
                     <span>{item.quantity}</span>
                     <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
-                    <button className="remove-btn" onClick={() => removeFromCart(item.id)}>🗑️</button>
+                    <button className="remove-btn" onClick={() => removeFromCart(item.id)}>&times;</button>
                   </div>
                 </div>
               </div>
@@ -102,7 +120,10 @@ function Navbar() {
         </div>
         {cartItems.length > 0 && (
           <div className="cart-footer">
-            <h3>Total: ₹{cartTotal.toFixed(2)}</h3>
+            <h3>
+              <span>Total:</span>
+              <span>₹{cartTotal}</span>
+            </h3>
             <button className="btn checkout-btn" onClick={() => { setIsCartOpen(false); navigate('/checkout'); }}>
               Proceed to Checkout
             </button>
@@ -110,7 +131,7 @@ function Navbar() {
         )}
       </div>
       
-      {/* Overlay to close cart */}
+      {/* Overlay */}
       {isCartOpen && <div className="cart-overlay" onClick={() => setIsCartOpen(false)}></div>}
     </>
   );

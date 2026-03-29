@@ -1,18 +1,17 @@
+import { API_URL } from "../config";
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
 import axios from 'axios';
 import './ProductPage.css';
 
 function KingBeds() {
-  const { addToCart } = useCart();
   const [kingBeds, setKingBeds] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/api/products?category=kingbeds');
+        const response = await axios.get(`${API_URL}/api/products?category=kingbeds`);
         setKingBeds(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -30,7 +29,7 @@ function KingBeds() {
         <div className="page-hero-overlay"></div>
         <div className="page-hero-content">
           <h1>King Beds</h1>
-          <p>Explore our collection of king size beds</p>
+          <p>Luxury king size beds for ultimate comfort</p>
         </div>
       </section>
       <section className="products-section">
@@ -47,7 +46,9 @@ function KingBeds() {
                   </Link>
                   <p>{bed.description}</p>
                   <span className="price">{bed.price}</span>
-                  <button className="add-to-cart" onClick={() => addToCart(bed)}>Add to Cart</button>
+                  <Link to={`/product/${bed.id}`} style={{ textDecoration: 'none', marginTop: '1rem', width: '100%' }}>
+                    <button className="view-product-btn">View Product</button>
+                  </Link>
                 </div>
               ))}
             </div>

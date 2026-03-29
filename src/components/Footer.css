@@ -111,6 +111,20 @@
   font-size: 0.9rem;
 }
 
+.newsletter-status {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  text-align: left;
+}
+
+.newsletter-status.success {
+  color: #2e7d32;
+}
+
+.newsletter-status.error {
+  color: #d32f2f;
+}
+
 /* Responsive Footer */
 @media (max-width: 992px) {
   .footer-container {

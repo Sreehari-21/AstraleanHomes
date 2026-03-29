@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { API_URL } from '../config';
 import './ProductPage.css';
 
 function Contact() {
@@ -8,6 +10,9 @@ function Contact() {
     message: ''
   });
 
+  const [status, setStatus] = useState({ type: '', message: '' });
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -16,10 +21,21 @@ function Contact() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert('Thank you for contacting us!');
-    setFormData({ name: '', email: '', message: '' });
+    setLoading(true);
+    setStatus({ type: '', message: '' });
+
+    try {
+      await axios.post(`${API_URL}/api/enquiries`, formData);
+      setStatus({ type: 'success', message: 'Thank you for contacting us! We will get back to you soon.' });
+      setFormData({ name: '', email: '', message: '' });
+    } catch (error) {
+      console.error('Error submitting enquiry:', error);
+      setStatus({ type: 'error', message: 'Failed to send message. Please try again later.' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,7 +74,22 @@ function Contact() {
             onChange={handleChange}
             required
           ></textarea>
-          <button type="submit">Send Message</button>
+          <button type="submit" disabled={loading}>
+            {loading ? 'Sending...' : 'Send Message'}
+          </button>
+          {status.message && (
+            <div className={`form-status ${status.type}`} style={{ 
+              marginTop: '1rem', 
+              padding: '1rem', 
+              borderRadius: '8px',
+              textAlign: 'center',
+              backgroundColor: status.type === 'success' ? '#f6ffed' : '#fff1f0',
+              border: `1px solid ${status.type === 'success' ? '#b7eb8f' : '#ffa39e'}`,
+              color: status.type === 'success' ? '#52c41a' : '#f5222d'
+            }}>
+              {status.message}
+            </div>
+          )}
         </form>
       </section>
     </div>
