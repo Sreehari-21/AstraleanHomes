@@ -4,9 +4,18 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
-app.use(cors());
+app.use(helmet());
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false
+}));
+app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*'}));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
@@ -496,6 +505,8 @@ app.get('*', (req, res) => {
   }
 });
 
+// Health check endpoint
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 // Start server
 const PORT = process.env.PORT || 5001;

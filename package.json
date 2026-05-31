@@ -4,6 +4,7 @@
   "description": "AstraleanHomes - Furniture E-commerce Platform",
   "main": "server.js",
   "scripts": {
+    "prod": "node server.js",
     "start": "node server.js",
     "server": "node server/index.js",
     "dev": "react-scripts start",
@@ -21,6 +22,8 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^4.22.1",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
     "json-server": "^0.17.4",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.3.0",
