@@ -1,0 +1,23 @@
+{
+  "services": [
+    {
+      "type": "web",
+      "name": "astralean-homes",
+      "env": "node",
+      "region": "oregon",
+      "plan": "free",
+      "buildCommand": "npm ci && npm run build",
+      "startCommand": "npm run prod",
+      "envVars": [
+        {
+          "key": "PORT",
+          "value": "5001"
+        },
+        {
+          "key": "ALLOWED_ORIGIN",
+          "value": "*"
+        }
+      ]
+    }
+  ]
+}
