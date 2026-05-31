@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 import Navbar from './components/Navbar';
@@ -48,6 +48,7 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/products" element={<Products />} />
+        <Route path="/products/:majorId" element={<Products />} />
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/sofas" element={<Sofas />} />
         <Route path="/beds" element={<Beds />} />

@@ -67,19 +67,119 @@ app.get('/api/categories', (req, res) => {
 // Add/Update Categories (Helper for Admin)
 app.post('/api/categories/:type', (req, res) => {
   const { type } = req.params;
-  const newData = req.body;
+  const allowedTypes = ['major', 'sub', 'collections'];
+  if (!allowedTypes.includes(type)) {
+    return res.status(400).json({ message: 'Invalid category type' });
+  }
+
+  const newData = { ...req.body };
   const db = readData(DB_FILE);
   if (!db) return res.status(500).json({ message: 'DB not found' });
 
   if (!db.categories[type]) db.categories[type] = [];
-  
-  // Simple ID generation or use provided ID
+
+  const gallery = Array.isArray(newData.images) ? newData.images.filter(Boolean) : [];
+  newData.image = newData.image || gallery[0] || '';
+  newData.images = newData.image
+    ? [newData.image, ...gallery.filter((img) => img !== newData.image)]
+    : gallery;
+
+  const existingIndex = newData.id
+    ? db.categories[type].findIndex((item) => item.id === newData.id)
+    : -1;
+
+  if (existingIndex !== -1) {
+    db.categories[type][existingIndex] = {
+      ...db.categories[type][existingIndex],
+      ...newData,
+    };
+    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+    return res.json(db.categories[type][existingIndex]);
+  }
+
   if (!newData.id) newData.id = `${type}-${Date.now()}`;
-  
+
   db.categories[type].push(newData);
-  
   fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
   res.status(201).json(newData);
+});
+
+// Update Category (Admin)
+app.put('/api/categories/:type/:id', (req, res) => {
+  const { type, id } = req.params;
+  const allowedTypes = ['major', 'sub', 'collections'];
+
+  if (!allowedTypes.includes(type)) {
+    return res.status(400).json({ message: 'Invalid category type' });
+  }
+
+  const db = readData(DB_FILE);
+  if (!db || !db.categories || !db.categories[type]) {
+    return res.status(404).json({ message: 'Categories not found' });
+  }
+
+  const index = db.categories[type].findIndex((item) => item.id === id);
+  if (index === -1) {
+    return res.status(404).json({ message: 'Category not found' });
+  }
+
+  const updatedData = { ...req.body, id };
+  const gallery = Array.isArray(updatedData.images) ? updatedData.images.filter(Boolean) : [];
+  updatedData.image = updatedData.image || gallery[0] || '';
+  updatedData.images = updatedData.image
+    ? [updatedData.image, ...gallery.filter((img) => img !== updatedData.image)]
+    : gallery;
+
+  db.categories[type][index] = {
+    ...db.categories[type][index],
+    ...updatedData,
+  };
+
+  fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+  res.json(db.categories[type][index]);
+});
+
+// Delete Category (Admin)
+app.delete('/api/categories/:type/:id', (req, res) => {
+  const { type, id } = req.params;
+  const allowedTypes = ['major', 'sub', 'collections'];
+
+  if (!allowedTypes.includes(type)) {
+    return res.status(400).json({ message: 'Invalid category type' });
+  }
+
+  const db = readData(DB_FILE);
+  if (!db || !db.categories || !db.categories[type]) {
+    return res.status(404).json({ message: 'Categories not found' });
+  }
+
+  const list = db.categories[type];
+  const exists = list.some((item) => item.id === id);
+  if (!exists) {
+    return res.status(404).json({ message: 'Category not found' });
+  }
+
+  if (type === 'major') {
+    const childSubs = (db.categories.sub || []).filter((sub) => sub.majorId === id);
+    if (childSubs.length > 0) {
+      return res.status(400).json({
+        message: `Cannot delete: ${childSubs.length} subcategory(ies) still use this major category. Delete them first.`,
+      });
+    }
+  }
+
+  if (type === 'sub') {
+    const childCollections = (db.categories.collections || []).filter((col) => col.subId === id);
+    if (childCollections.length > 0) {
+      return res.status(400).json({
+        message: `Cannot delete: ${childCollections.length} collection(s) still use this subcategory. Delete them first.`,
+      });
+    }
+  }
+
+  db.categories[type] = list.filter((item) => item.id !== id);
+  fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+  res.json({ message: 'Category deleted successfully' });
 });
 
 // Get Single Product
@@ -143,18 +243,114 @@ app.post('/api/products', (req, res) => {
   res.status(201).json(productData);
 });
 
+// Default settings
+const DEFAULT_SETTINGS = {
+  payment: {
+    razorpayEnabled: false,
+    codEnabled: true
+  },
+  store: {
+    name: "AstraleanHomes",
+    deliveryDuration: "3-5 Business Days",
+    contactEmail: "support@astraleanhomes.com",
+    termsAndConditions: "Standard terms apply.",
+    gstNumber: ""
+  }
+};
+
 // Get Store Settings
 app.get('/api/settings', (req, res) => {
-  // Return default or mock settings if settings.json doesn't exist
-  const settings = {
-    store: {
-      name: "AstraleanHomes",
-      deliveryDuration: "3-5 Business Days",
-      contactEmail: "support@astraleanhomes.com"
-    }
-  };
-  res.json(settings);
+  const db = readData(DB_FILE);
+  if (!db) return res.json(DEFAULT_SETTINGS);
+  
+  if (!db.settings) {
+    db.settings = DEFAULT_SETTINGS;
+    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+  }
+  res.json(db.settings);
 });
+
+// Update Store Settings
+app.put('/api/settings', (req, res) => {
+  const db = readData(DB_FILE);
+  if (!db) return res.status(500).json({ message: 'DB not found' });
+
+  if (!db.settings) {
+    db.settings = DEFAULT_SETTINGS;
+  }
+
+  // Merge nested payment and store settings
+  if (req.body.payment) {
+    db.settings.payment = { ...db.settings.payment, ...req.body.payment };
+  }
+  if (req.body.store) {
+    db.settings.store = { ...db.settings.store, ...req.body.store };
+  }
+
+  fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+  res.json(db.settings);
+});
+
+// --- ORDERS API ---
+
+// Create Order
+app.post('/api/orders', (req, res) => {
+  const orderData = req.body;
+  const db = readData(DB_FILE);
+  if (!db) return res.status(500).json({ message: 'DB not found' });
+
+  if (!db.orders) db.orders = [];
+
+  const newOrder = {
+    id: `ord-${Date.now()}`,
+    ...orderData,
+    date: new Date().toISOString()
+  };
+
+  db.orders.push(newOrder);
+  fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+
+  res.status(201).json(newOrder);
+});
+
+// Get All Orders
+app.get('/api/orders', (req, res) => {
+  const db = readData(DB_FILE);
+  if (!db || !db.orders) return res.json([]);
+  res.json(db.orders);
+});
+
+// Update Order Status
+app.put('/api/orders/:id', (req, res) => {
+  const db = readData(DB_FILE);
+  if (!db || !db.orders) return res.status(404).json({ message: 'No orders found' });
+
+  const orderIndex = db.orders.findIndex(o => o.id === req.params.id);
+  if (orderIndex === -1) {
+    return res.status(404).json({ message: 'Order not found' });
+  }
+
+  db.orders[orderIndex] = { ...db.orders[orderIndex], ...req.body };
+  fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+  res.json(db.orders[orderIndex]);
+});
+
+// Delete Order
+app.delete('/api/orders/:id', (req, res) => {
+  const db = readData(DB_FILE);
+  if (!db || !db.orders) return res.status(404).json({ message: 'No orders found' });
+
+  const initialLength = db.orders.length;
+  db.orders = db.orders.filter(o => o.id !== req.params.id);
+
+  if (db.orders.length === initialLength) {
+    return res.status(404).json({ message: 'Order not found' });
+  }
+
+  fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+  res.json({ message: 'Order deleted successfully' });
+});
+
 
 // Auth Routes (Modified to use helper)
 

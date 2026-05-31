@@ -1,7 +1,7 @@
 import { API_URL } from "../config";
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
+import ProductCard from '../components/ProductCard';
 import './ProductPage.css';
 
 function Furnishings() {
@@ -47,18 +47,15 @@ function Furnishings() {
               <div className="category">
                 <h2>Soft Furnishings</h2>
                 <div className="products-grid">
-                  {furnishings.map(item => (
-                    <div key={item.id} className="product-card">
-                      <Link to={`/product/${item.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                        <img src={item.image} alt={item.name} className="product-image" />
-                        <h3>{item.name}</h3>
-                      </Link>
-                      <p>{item.description}</p>
-                      <span className="price">{item.price}</span>
-                      <Link to={`/product/${item.id}`} style={{ textDecoration: 'none', marginTop: '1rem', width: '100%' }}>
-                        <button className="view-product-btn">View Product</button>
-                      </Link>
-                    </div>
+                  {furnishings.map((item) => (
+                    <ProductCard
+                      key={item.id}
+                      href={`/product/${item.id}`}
+                      image={item.image}
+                      name={item.name}
+                      description={item.description}
+                      price={item.price}
+                    />
                   ))}
                 </div>
               </div>
@@ -66,18 +63,15 @@ function Furnishings() {
               <div className="category" style={{ marginTop: '6rem' }}>
                 <h2>Home Decor</h2>
                 <div className="products-grid">
-                  {decor.map(item => (
-                    <div key={item.id} className="product-card">
-                      <Link to={`/product/${item.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                        <img src={item.image} alt={item.name} className="product-image" />
-                        <h3>{item.name}</h3>
-                      </Link>
-                      <p>{item.description}</p>
-                      <span className="price">{item.price}</span>
-                      <Link to={`/product/${item.id}`} style={{ textDecoration: 'none', marginTop: '1rem', width: '100%' }}>
-                        <button className="view-product-btn">View Product</button>
-                      </Link>
-                    </div>
+                  {decor.map((item) => (
+                    <ProductCard
+                      key={item.id}
+                      href={`/product/${item.id}`}
+                      image={item.image}
+                      name={item.name}
+                      description={item.description}
+                      price={item.price}
+                    />
                   ))}
                 </div>
               </div>

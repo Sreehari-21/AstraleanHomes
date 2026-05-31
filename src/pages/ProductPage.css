@@ -112,6 +112,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 3rem;
   margin-top: 3rem;
+  align-items: stretch;
 }
 
 /* Premium Product Card */
@@ -124,8 +125,13 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  height: 100%;
   overflow: hidden;
   border: 1px solid rgba(0,0,0,0.02);
+}
+
+.product-card-media {
+  display: block;
 }
 
 .product-card:hover {
@@ -135,8 +141,10 @@
 
 .product-image {
   width: 100%;
+  height: auto;
   aspect-ratio: 4 / 3;
   object-fit: cover;
+  display: block;
   border-radius: 20px 20px 0 0;
   margin-bottom: 0;
   transition: transform 0.5s ease;
@@ -146,10 +154,11 @@
   transform: scale(1.05);
 }
 
-.product-card > h3,
-.product-card > p,
-.product-card > span {
-  padding: 0 1.5rem;
+.product-card h3,
+.product-card p,
+.product-card .price {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 
 .product-card h3 {
@@ -164,19 +173,27 @@
   color: var(--text-secondary);
   font-size: 1rem;
   line-height: 1.5;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   flex-grow: 1;
+  min-height: 3rem;
 }
 
 .price {
+  display: block;
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--primary-color);
   margin-bottom: 1.5rem;
+  min-height: 2.25rem;
 }
 
-.product-card > a {
+.price-placeholder {
+  visibility: hidden;
+}
+
+.product-card-action {
   margin: 0 1.5rem 1.5rem 1.5rem;
+  margin-top: auto !important;
 }
 
 .add-to-cart {
@@ -271,6 +288,20 @@
   height: 3px;
   background: var(--primary-color);
   border-radius: 2px;
+}
+
+.category-back-link {
+  display: inline-block;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.category-back-link:hover {
+  color: var(--primary-color);
 }
 
 .subcategory {
@@ -374,8 +405,9 @@
     margin-top: 1rem;
     margin-bottom: 0.25rem;
   }
-  .product-card > h3, .product-card > p, .product-card > span {
-    padding: 0 1rem;
+  .product-card h3, .product-card p, .product-card .price {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
   .add-to-cart {
     width: calc(100% - 2rem);
@@ -383,8 +415,9 @@
     padding: 0.75rem;
     font-size: 0.9rem;
   }
-  .product-card > a {
+  .product-card-action {
     margin: 0 1rem 1rem 1rem;
+    margin-top: auto !important;
   }
 }
 
