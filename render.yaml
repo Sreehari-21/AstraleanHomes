@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: astralean-homes
+    name: astraleanhomes
     env: node
     region: oregon
     plan: free
@@ -10,5 +10,5 @@ services:
       - key: ALLOWED_ORIGIN
         value: "*"
       - key: NODE_ENV
-        value: "development"
+        value: "production"
 

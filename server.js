@@ -20,7 +20,12 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // Serve static files from React app
-app.use(express.static(path.join(__dirname, 'build')));
+const staticPath = path.join(__dirname, 'build');
+console.log('🔧 Static assets will be served from:', staticPath);
+if (!fs.existsSync(staticPath)) {
+  console.warn('⚠️ Build directory does not exist at startup');
+}
+app.use(express.static(staticPath));
 
 const USERS_FILE = path.join(__dirname, 'users.json');
 const DB_FILE = path.join(__dirname, 'data', 'db.json');
