@@ -4,8 +4,8 @@ services:
     env: node
     region: oregon
     plan: free
-    installCommand: npm install --production=false && npm run build
-
+    installCommand: npm install --production=false
+    buildCommand: npm run build
     startCommand: npm run prod
     envVars:
       - key: ALLOWED_ORIGIN
