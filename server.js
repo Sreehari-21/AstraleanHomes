@@ -8,12 +8,14 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
+app.set('trust proxy', 1);
 app.use(helmet());
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  validate: { trustProxy: false }
 }));
 app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*'}));
 app.use(bodyParser.json({ limit: '50mb' }));
